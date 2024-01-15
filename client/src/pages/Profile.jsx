@@ -116,7 +116,7 @@ export default function Profile() {
     } catch (error) {
       dispatch(signOutFailure(error.message));
     }
-  };
+  }; 
 
   return (
     <div className="p-3 max-w-lg mx-auto">
