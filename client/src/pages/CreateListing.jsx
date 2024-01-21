@@ -8,12 +8,15 @@ import { useState } from "react";
 import { app } from "../firebase";
 export default function CreateListing() {
   const [files, setFiles] = useState();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({ 
     imageUrls: [],
   });
+  const [uploading, setUploading] = useState(false);
   const [imageUploadError, setImageUploadError] = useState(false);
   const handleImageSubmit = (e) => {
     if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
+      setUploading(true);
+      setImageUploadError(false);
       const promises = [];
 
       for (let i = 0; i < files.length; i++) {
@@ -26,12 +29,15 @@ export default function CreateListing() {
             imageUrls: formData.imageUrls.concat(urls),
           });
           setImageUploadError(false);
+          setUploading(false);
         })
         .catch((error) => {
           setImageUploadError("Image upload failed (2mb max per image)");
+          setUploading(false);
         });
     } else {
       setImageUploadError("You can only upload a maximum of 6 images");
+      setUploading(false);
     }
   };
   const storeImage = async (file) => {
@@ -185,10 +191,11 @@ export default function CreateListing() {
             />
             <button
               onClick={handleImageSubmit}
+              disabled={uploading}
               type="button"
               className="p-3 text-green-700 border border-green-700 rounded uppercase hover:shadow-lg disabled:opacity-80"
             >
-              Upload
+              {uploading ? "Uploading..." : "Upload"}
             </button>
           </div>
           <p className="text-red-700 text-sm">
