@@ -1,4 +1,5 @@
 import Listning from "../models/listning.model.js";
+import { errorHandler } from "../utils/error.js";
 
 export const createListning = async (req, res, next) => {
   try {
@@ -20,6 +21,27 @@ export const deleteListning = async (req, res, next) => {
   try {
     await Listning.findByIdAndDelete(req.params.id);
     res.status(200).json("Listning has been deleted");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const editListing = async (req, res, next) => {
+  const listing = await Listning.findById(req.params.id);
+  if (!listing) return next(errorHandler(404, "Listing not found"));
+
+  if (req.user.id !== listing.userRef)
+    return next(401, "You can edit only your listings");
+
+  try {
+    const editedListing = await Listning.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+      }
+    );
+    res.status(200).json(editedListing);
   } catch (error) {
     next(error);
   }
